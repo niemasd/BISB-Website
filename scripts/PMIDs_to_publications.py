@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # parse input publications
     stderr.write("Parsing input PMIDs...\n")
     skip = {l.strip() for l in skipfile}
-    pmids = {l.strip() for l in infile if l.strip() not in skip}
+    pmids = {l.strip() for l in infile if l.strip() not in skip and len(l.strip()) != 0}
     if len(pmids) == 0:
         raise RuntimeError("No PMIDs to query")
 
