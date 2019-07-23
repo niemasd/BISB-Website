@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     # parse input publications
     stderr.write("Parsing input PMIDs...\n")
-    pmids = [l.strip() for l in infile]
+    pmids = {l.strip() for l in infile}
 
     # prep Entrez
     stderr.write("Preparing Entrez...\n")
