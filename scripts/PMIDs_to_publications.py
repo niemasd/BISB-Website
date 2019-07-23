@@ -20,6 +20,7 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--input', required=False, type=str, default='stdin', help="Input PMID List (one per line)")
     parser.add_argument('-o', '--output', required=False, type=str, default='stdout', help="Output Publication Data File (TSV)")
     parser.add_argument('-e', '--email', required=True, type=str, help="Email Address (for Entrez)")
+    parser.add_argument('-s', '--skip', required=False, type=str, default=None, help="List of PMIDs to Skip (one per line)")
     args = parser.parse_args()
     if args.input == 'stdin':
         from sys import stdin as infile
@@ -29,10 +30,17 @@ if __name__ == "__main__":
         from sys import stdout as outfile
     else:
         outfile = open(args.output,'w')
+    if args.skip is None:
+        skipfile = list()
+    else:
+        skipfile = open(args.skip)
 
     # parse input publications
     stderr.write("Parsing input PMIDs...\n")
-    pmids = {l.strip() for l in infile}
+    skip = {l.strip() for l in skipfile}
+    pmids = {l.strip() for l in infile if l.strip() not in skip}
+    if len(pmids) == 0:
+        raise RuntimeError("No PMIDs to query")
 
     # prep Entrez
     stderr.write("Preparing Entrez...\n")
