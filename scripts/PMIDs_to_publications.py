@@ -3,6 +3,7 @@
 Scrape and reformat publication information for bulk upload to the BISB website
 Niema Moshiri 2019
 '''
+NA = 'N/A'
 COL_ORDER = ['PMID', 'PMCID', 'DOI', 'Source', 'FullJournalName', 'Year', 'Volume', 'Issue', 'Pages', 'Title', 'AuthorListStr']
 NO_CAPITAL = {'and', 'in', 'of', 'the'}
 
@@ -57,7 +58,7 @@ if __name__ == "__main__":
         if 'pmc' in record['ArticleIds']:
             record['PMCID'] = record['ArticleIds']['pmc']          # get PMCID
         else:
-            record['PMCID'] = 'N/A'                                # specify N/A for missing PMCID
+            record['PMCID'] = NA                                   # specify N/A for missing PMCID
         for k in ['PMID','PMCID']:                                 # sometimes PMID is a list
             if isinstance(record[k], list):
                 record[k] = record[k][0]
@@ -66,13 +67,14 @@ if __name__ == "__main__":
         for k in ['Source','FullJournalName']:                     # titlize journal name (abbreviated and full)
             record[k] = titlize(record[k])
         record['Title'] = record['Title'].rstrip('.')              # remove trailing period from title
-        if record['Issue'].strip() == '':                          # specify N/A for missing issue
-            record['Issue'] = 'N/A'
+        for k in ['Volume','Issue','Pages']:                       # specify N/A for missing volume/issue/pages
+            if record[k].strip() == '':
+                record[k] = NA
         if 'DOI' not in record:
             if 'doi' in record:                                    # sometimes DOI is key 'doi' instead of 'DOI'
                 record['DOI'] = record['doi']
             else:
-                record['DOI'] = 'N/A'                              # specify N/A for missing DOI
+                record['DOI'] = NA                                 # specify N/A for missing DOI
 
         # output record
         outfile.write('\t'.join(record[k] for k in COL_ORDER))
