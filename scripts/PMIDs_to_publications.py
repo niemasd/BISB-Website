@@ -38,17 +38,25 @@ if __name__ == "__main__":
     for record in records:
         # prep record
         record['PMID'] = record['ArticleIds']['pubmed']            # get PMID
-        record['PMCID'] = record['ArticleIds']['pmc']              # get PMCID
+        if 'pmc' in record['ArticleIds']:
+            record['PMCID'] = record['ArticleIds']['pmc']          # get PMCID
+        else:
+            record['PMCID'] = 'N/A'                                # specify N/A for missing PMCID
         for k in ['PMID','PMCID']:                                 # sometimes PMID is a list
             if isinstance(record[k], list):
                 record[k] = record[k][0]
         record['Year'] = str(int(record['PubDate'].split(' ')[0])) # get year from publication date
-        record['AuthorListStr'] = ','.join(record['AuthorList'])   # comma-separate authors
+        record['AuthorListStr'] = '|'.join(record['AuthorList'])   # pipe-separate authors
         for k in ['Source','FullJournalName']:                     # titlize journal name (abbreviated and full)
             record[k] = titlize(record[k])
         record['Title'] = record['Title'].rstrip('.')              # remove trailing period from title
         if record['Issue'].strip() == '':                          # specify N/A for missing issue
             record['Issue'] = 'N/A'
+        if 'DOI' not in record:
+            if 'doi' in record:                                    # sometimes DOI is key 'doi' instead of 'DOI'
+                record['DOI'] = record['doi']
+            else:
+                record['DOI'] = 'N/A'                              # specify N/A for missing DOI
 
         # output record
         outfile.write('\t'.join(record[k] for k in COL_ORDER))
