@@ -75,7 +75,8 @@ if __name__ == "__main__":
                 record['DOI'] = record['doi']
             else:
                 record['DOI'] = NA                                 # specify N/A for missing DOI
-        record['DOI'] = 'doi:%s' % record['DOI']                   # prepend DOIs with "doi:"
+        if record['DOI'] != NA:
+            record['DOI'] = 'doi:%s' % record['DOI']                   # prepend DOIs with "doi:"
 
         # output record
         outfile.write('\t'.join(record[k] for k in COL_ORDER))
