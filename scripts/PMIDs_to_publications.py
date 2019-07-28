@@ -4,7 +4,7 @@ Scrape and reformat publication information for bulk upload to the BISB website
 Niema Moshiri 2019
 '''
 NA = 'N/A'
-COL_ORDER = ['PMID', 'PMCID', 'DOI', 'Source', 'FullJournalName', 'Year', 'Volume', 'Issue', 'Pages', 'Title', 'AuthorListStr']
+COL_ORDER = ['PMID', 'PMCID', 'DOI', 'Source', 'FullJournalName', 'ISSN', 'Year', 'Volume', 'Issue', 'Pages', 'Title', 'AuthorListStr']
 NO_CAPITAL = {'and', 'in', 'of', 'the'}
 
 def titlize(name):
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         for k in ['Source','FullJournalName']:                     # titlize journal name (abbreviated and full)
             record[k] = titlize(record[k])
         record['Title'] = record['Title'].rstrip('.')              # remove trailing period from title
-        for k in ['Volume','Issue','Pages']:                       # specify N/A for missing volume/issue/pages
+        for k in ['ISSN', 'Volume','Issue','Pages']:               # specify N/A for missing ISSN/volume/issue/pages
             if record[k].strip() == '':
                 record[k] = NA
         if 'DOI' not in record:
@@ -76,7 +76,7 @@ if __name__ == "__main__":
             else:
                 record['DOI'] = NA                                 # specify N/A for missing DOI
         if record['DOI'] != NA:
-            record['DOI'] = 'doi:%s' % record['DOI']                   # prepend DOIs with "doi:"
+            record['DOI'] = 'doi:%s' % record['DOI']               # prepend DOIs with "doi:"
 
         # output record
         outfile.write('\t'.join(record[k] for k in COL_ORDER))
