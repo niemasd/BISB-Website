@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # parse user arguments
     from sys import stderr; import argparse
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-i', '--input', required=False, type=str, default='stdin', help="Input Publication Information")
+    parser.add_argument('-i', '--input', required=False, type=str, default='stdin', help="Input Publication Information TSV")
     parser.add_argument('-o', '--output', required=False, type=str, default='stdout', help="Output Drupal CSV")
     args = parser.parse_args()
     if args.input == 'stdin':
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         outfile = open(args.output,'w')
 
     # parse publication info list and reformat output
-    outfile.write("title,field_biblio_authors_field,field_doi,field_url,field_isbn_number,field_issn_number,field_issue,field_number_of_volumes,field_custom7,field_publisher,field_pubmed_id,field_pubmed_url,field_tracks,field_biblio_type,field_volume,field_biblio_year\n")
+    outfile.write("title,field_biblio_authors_field,field_doi,field_url,field_isbn_number,field_issn_number,field_issue,field_number_of_volumes,field_custom7,field_publisher,field_pubmed_id,field_pubmed_url,field_tracks,field_biblio_type,field_volume,field_biblio_year,field_journal,field_pages\n")
     for l in infile:
         if l.startswith('PMID\t'):
             continue
@@ -73,7 +73,9 @@ if __name__ == "__main__":
         entry['bisb_tracks'] = ''
         entry['volume'] = volume.strip()
         entry['year'] = year.strip()
+        entry['journal'] = journal_abbr.strip()
+        entry['pages'] = pages.strip()
         for k in entry:
             if entry[k].strip() == NA:
                 entry[k] = ''
-        outfile.write('%s\n' % (','.join(('"%s"' % entry[k]) for k in ['title','authors','doi','url','isbn','issn','issue','num_volumes','pmcid','publisher','pmid','pubmed_url','bisb_tracks','pub_type','volume','year'])))
+        outfile.write('%s\n' % (','.join(('"%s"' % entry[k]) for k in ['title','authors','doi','url','isbn','issn','issue','num_volumes','pmcid','publisher','pmid','pubmed_url','bisb_tracks','pub_type','volume','year','journal','pages'])))
