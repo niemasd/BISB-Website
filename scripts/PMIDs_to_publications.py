@@ -3,9 +3,14 @@
 Scrape and reformat publication information for bulk upload to the BISB website
 Niema Moshiri 2019
 '''
+import re
 NA = 'N/A'
 COL_ORDER = ['PMID', 'PMCID', 'DOI', 'Source', 'FullJournalName', 'ISSN', 'Year', 'Volume', 'Issue', 'Pages', 'Title', 'AuthorListStr']
 NO_CAPITAL = {'and', 'in', 'of', 'the'}
+HTML_REGEX = re.compile('<.*?>')
+
+def remove_HTML_tags(s):
+    return re.sub(HTML_REGEX, '', s)
 
 def titlize(name):
     parts = name.split(' ')
@@ -79,7 +84,7 @@ if __name__ == "__main__":
             record['DOI'] = 'doi:%s' % record['DOI']               # prepend DOIs with "doi:"
 
         # output record
-        outfile.write('\t'.join(record[k] for k in COL_ORDER))
+        outfile.write(remove_HTML_tags('\t'.join(record[k] for k in COL_ORDER)))
         outfile.write('\n')
         stderr.write("Completed record %d of %d\r" % (i+1,len(records)))
     stderr.write('\nDone\n')

@@ -28,7 +28,7 @@ if __name__ == "__main__":
         outfile = open(args.output,'w')
 
     # parse publication info list and reformat output
-    outfile.write("title,field_biblio_authors_field,field_doi,field_url,field_isbn_number,field_issn_number,field_issue,field_number_of_volumes,field_custom7,field_publisher,field_pubmed_id,field_pubmed_url,field_tracks,field_biblio_type,field_volume,field_biblio_year,field_journal,field_pages\n")
+    outfile.write("title,field_biblio_authors_field,field_doi,field_isbn_number,field_issn_number,field_issue,field_number_of_volumes,field_custom7,field_publisher,field_pubmed_id,field_tracks,field_biblio_type,field_volume,field_biblio_year,field_journal,field_pages\n")
     for l in infile:
         if l.startswith('PMID\t'):
             continue
@@ -38,22 +38,18 @@ if __name__ == "__main__":
         entry['authors'] = '; '.join('%s. %s' % ('.'.join(a.split(' ')[-1]), ' '.join(a.split(' ')[:-1])) for a in authors.split('|'))
         if doi_isbn_url.lower().startswith('doi:'):    # parse DOI
             entry['doi'] = ':'.join(doi_isbn_url.split(':')[1:]).strip()
-            entry['url'] = '%s/%s' % (DOI_URL_PREFIX, entry['doi'])
             entry['isbn'] = ''
             entry['pub_type'] = PUB_TYPE['journal']
         elif doi_isbn_url.lower().startswith('isbn:'): # parse ISBN
             entry['doi'] = ''
             entry['isbn'] = ':'.join(doi_isbn_url.split(':')[1:]).strip(); url = '%s/%s' % (ISBN_URL_PREFIX, entry['isbn'])
-            entry['url'] = '%s/%s' % (ISBN_URL_PREFIX, entry['isbn'])
             entry['pub_type'] = PUB_TYPE['book']
         elif doi_isbn_url.lower().startswith('url:'):  # parse URL
             entry['doi'] = ''
-            entry['url'] = ':'.join(doi_isbn_url.split(':')[1:]).strip()
             entry['isbn'] = ''
             entry['pub_type'] = PUB_TYPE['other']
         elif doi_isbn_url.strip() == NA:
             entry['doi'] = ''
-            entry['url'] = ''
             entry['isbn'] = ''
             entry['pub_type'] = ''
         else:
@@ -65,10 +61,8 @@ if __name__ == "__main__":
         entry['publisher'] = ''
         if pmid.strip() == NA:
             entry['pmid'] = ''
-            entry['pubmed_url'] = ''
         else:
             entry['pmid'] = pmid
-            entry['pubmed_url'] = '%s/%s' % (PUBMED_URL_PREFIX, entry['pmid'])
             entry['pub_type'] = PUB_TYPE['journal'] # override
         entry['bisb_tracks'] = ''
         entry['volume'] = volume.strip()
@@ -78,4 +72,4 @@ if __name__ == "__main__":
         for k in entry:
             if entry[k].strip() == NA:
                 entry[k] = ''
-        outfile.write('%s\n' % (','.join(('"%s"' % entry[k]) for k in ['title','authors','doi','url','isbn','issn','issue','num_volumes','pmcid','publisher','pmid','pubmed_url','bisb_tracks','pub_type','volume','year','journal','pages'])))
+        outfile.write('%s\n' % (','.join(('"%s"' % entry[k].replace('"',"'")) for k in ['title','authors','doi','isbn','issn','issue','num_volumes','pmcid','publisher','pmid','bisb_tracks','pub_type','volume','year','journal','pages'])))
