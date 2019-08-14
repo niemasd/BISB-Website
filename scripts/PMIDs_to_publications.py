@@ -59,32 +59,33 @@ if __name__ == "__main__":
     stderr.write("Outputting %d publication records...\n" % len(records))
     for i,record in enumerate(records):
         # prep record
-        record['PMID'] = record['ArticleIds']['pubmed']            # get PMID
+        record['PMID'] = record['ArticleIds']['pubmed']                     # get PMID
         if 'pmc' in record['ArticleIds']:
-            record['PMCID'] = record['ArticleIds']['pmc']          # get PMCID
+            record['PMCID'] = record['ArticleIds']['pmc']                   # get PMCID
         else:
-            record['PMCID'] = NA                                   # specify N/A for missing PMCID
-        for k in ['PMID','PMCID']:                                 # sometimes PMID is a list
+            record['PMCID'] = NA                                            # specify N/A for missing PMCID
+        for k in ['PMID','PMCID']:                                          # sometimes PMID is a list
             if isinstance(record[k], list):
                 record[k] = record[k][0]
-        record['Year'] = str(int(record['PubDate'].split(' ')[0])) # get year from publication date
-        record['AuthorListStr'] = '|'.join(record['AuthorList'])   # pipe-separate authors
-        for k in ['Source','FullJournalName']:                     # titlize journal name (abbreviated and full)
+        record['Year'] = str(int(record['PubDate'].split(' ')[0]))          # get year from publication date
+        record['AuthorList'] = [a.strip('.') for a in record['AuthorList']] # remove periods from ends of author names
+        record['AuthorListStr'] = '|'.join(record['AuthorList'])            # pipe-separate authors
+        for k in ['Source','FullJournalName']:                              # titlize journal name (abbreviated and full)
             record[k] = titlize(record[k])
-        record['Title'] = record['Title'].rstrip('.')              # remove trailing period from title
-        for k in ['ISSN', 'Volume','Issue','Pages']:               # specify N/A for missing ISSN/volume/issue/pages
+        record['Title'] = record['Title'].rstrip('.')                       # remove trailing period from title
+        for k in ['ISSN', 'Volume','Issue','Pages']:                        # specify N/A for missing ISSN/volume/issue/pages
             if record[k].strip() == '':
                 record[k] = NA
         if 'DOI' not in record:
-            if 'doi' in record:                                    # sometimes DOI is key 'doi' instead of 'DOI'
+            if 'doi' in record:                                             # sometimes DOI is key 'doi' instead of 'DOI'
                 record['DOI'] = record['doi']
             else:
-                record['DOI'] = NA                                 # specify N/A for missing DOI
+                record['DOI'] = NA                                          # specify N/A for missing DOI
         if record['DOI'] != NA:
-            record['DOI'] = 'doi:%s' % record['DOI']               # prepend DOIs with "doi:"
+            record['DOI'] = 'doi:%s' % record['DOI']                        # prepend DOIs with "doi:"
 
         # output record
-        outfile.write(remove_HTML_tags('\t'.join(record[k] for k in COL_ORDER)))
+        outfile.write(remove_HTML_tags('\t'.join(record[k].strip('.') for k in COL_ORDER)))
         outfile.write('\n')
         stderr.write("Completed record %d of %d\r" % (i+1,len(records)))
     stderr.write('\nDone\n')

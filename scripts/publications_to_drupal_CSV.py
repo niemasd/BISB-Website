@@ -35,7 +35,7 @@ if __name__ == "__main__":
         pmid,pmcid,doi_isbn_url,journal_abbr,journal_full,issn,year,volume,issue,pages,title,authors = l.strip().split('\t')
         entry = dict()
         entry['title'] = title.strip()
-        entry['authors'] = '; '.join('%s. %s' % ('.'.join(a.split(' ')[-1]), ' '.join(a.split(' ')[:-1])) for a in authors.split('|'))
+        entry['authors'] = authors.replace('|', ', ')
         if doi_isbn_url.lower().startswith('doi:'):    # parse DOI
             entry['doi'] = ':'.join(doi_isbn_url.split(':')[1:]).strip()
             entry['isbn'] = ''
