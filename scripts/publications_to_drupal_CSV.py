@@ -28,14 +28,15 @@ if __name__ == "__main__":
         outfile = open(args.output,'w')
 
     # parse publication info list and reformat output
-    outfile.write("title,field_biblio_authors_field,field_doi,field_isbn_number,field_issn_number,field_issue,field_number_of_volumes,field_custom7,field_publisher,field_pubmed_id,field_tracks,field_biblio_type,field_volume,field_biblio_year,field_journal,field_pages\n")
+    outfile.write("title,field_authors,field_doi,field_isbn_number,field_issn_number,field_issue,field_journal,field_pages,field_pmc_id,field_pubmed_id,field_training_grant,field_type,field_volume,field_year\n")
     for l in infile:
         if l.startswith('PMID\t'):
             continue
-        pmid,pmcid,doi_isbn_url,journal_abbr,journal_full,issn,year,volume,issue,pages,title,authors = l.strip().split('\t')
+        pmid,pmcid,doi_isbn_url,journal_abbr,journal_full,issn,year,volume,issue,pages,title,authors,training_grant = l.strip().split('\t')
         entry = dict()
         entry['title'] = title.strip()
         entry['authors'] = authors.replace('|', ', ')
+        entry['training_grant'] = {'Yes':'1', 'No':'0'}[training_grant.strip()]
         if doi_isbn_url.lower().startswith('doi:'):    # parse DOI
             entry['doi'] = ':'.join(doi_isbn_url.split(':')[1:]).strip()
             entry['isbn'] = ''
@@ -56,15 +57,12 @@ if __name__ == "__main__":
             raise ValueError("Unrecognized DOI/ISBN/URL: %s" % doi_isbn_url.strip())
         entry['issn'] = issn.strip()
         entry['issue'] = issue.strip()
-        entry['num_volumes'] = ''
         entry['pmcid'] = pmcid
-        entry['publisher'] = ''
         if pmid.strip() == NA:
             entry['pmid'] = ''
         else:
             entry['pmid'] = pmid
             entry['pub_type'] = PUB_TYPE['journal'] # override
-        entry['bisb_tracks'] = ''
         entry['volume'] = volume.strip()
         entry['year'] = year.strip()
         entry['journal'] = journal_abbr.strip()
@@ -72,4 +70,4 @@ if __name__ == "__main__":
         for k in entry:
             if entry[k].strip() == NA:
                 entry[k] = ''
-        outfile.write('%s\n' % (','.join(('"%s"' % entry[k].replace('"',"'")) for k in ['title','authors','doi','isbn','issn','issue','num_volumes','pmcid','publisher','pmid','bisb_tracks','pub_type','volume','year','journal','pages'])))
+        outfile.write('%s\n' % (','.join(('"%s"' % entry[k].replace('"',"'")) for k in ['title','authors','doi','isbn','issn','issue','journal','pages','pmcid','pmid','training_grant','pub_type','volume','year'])))
