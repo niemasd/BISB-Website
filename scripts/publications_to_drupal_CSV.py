@@ -28,7 +28,7 @@ if __name__ == "__main__":
         outfile = open(args.output,'w')
 
     # parse publication info list and reformat output
-    outfile.write("title,field_authors,field_doi,field_isbn_number,field_issn_number,field_issue,field_journal,field_pages,field_pmc_id,field_pubmed_id,field_training_grant,field_type,field_volume,field_year\n")
+    outfile.write("title,field_authors,field_doi,field_isbn_number,field_issn_number,field_issue,field_journal,field_pages,field_pmc_id,field_pubmed_id,field_bisb_training_grant,field_type,field_volume,field_year\n")
     for l in infile:
         if l.startswith('PMID\t'):
             continue
