@@ -32,7 +32,11 @@ if __name__ == "__main__":
     for l in infile:
         if l.startswith('PMID\t'):
             continue
-        pmid,pmcid,doi_isbn_url,journal_abbr,journal_full,issn,year,volume,issue,pages,title,authors,training_grant = l.strip().split('\t')
+        try:
+            pmid,pmcid,doi_isbn_url,journal_abbr,journal_full,issn,year,volume,issue,pages,title,authors,training_grant = l.strip().split('\t')
+        except Exception as e:
+            print("ERROR WITH LINE: %s" % l.strip())
+            raise e
         entry = dict()
         entry['title'] = title.strip()
         entry['authors'] = authors.replace('|', ', ')
